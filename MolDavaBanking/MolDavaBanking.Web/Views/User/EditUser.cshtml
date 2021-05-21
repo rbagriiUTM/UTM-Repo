@@ -1,0 +1,161 @@
+﻿@model MolDavaBanking.Domain.UserViewModel.UserViewModel_GetUsers
+
+@{
+    ViewBag.Title = "Edit User";
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h4>Edit User</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FirstName, Model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text=danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LastName, Model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text=danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IDNP, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.IDNP, Model.IDNP, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.IDNP, "", new { @class = "text=danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BirthDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.BirthDate, new { htmlAttributes = new { @class = "form-control", @Value = Model.BirthDate.ToString("yyyy-MM-dd") } })
+                @Html.ValidationMessageFor(model => model.BirthDate, "", new { @class = "text=danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Adress, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Adress, Model.Adress, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Adress, "", new { @class = "text=danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, Model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text=danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsLocked, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div>
+                    <label>@Html.RadioButtonFor(model => model.IsLocked, 1)Locked</label>
+                </div>
+                <div>
+                    <label>@Html.RadioButtonFor(model => model.IsLocked, 0)Unlocked</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Roles", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10" id="Roles">
+                @if (Model.Roles.Where(r => r.Name == "Admin").Count() == 1)
+                {
+                    Model.IsAdmin = true;
+                }
+
+                @if (Model.Roles.Where(r => r.Name == "Accountant").Count() == 1)
+                {
+                    Model.IsAccountant = true;
+                }
+
+                @if (Model.Roles.Where(r => r.Name == "Client").Count() == 1)
+                {
+                    Model.IsClient = true;
+                }
+                <div>
+                    <label>@Html.CheckBoxFor(model => model.IsAdmin) Admin</label>
+                </div>
+                <div>
+                    <label>@Html.CheckBoxFor(model => model.IsAccountant) Accountant</label>
+                </div>
+                <div>
+                    <label>@Html.CheckBoxFor(model => model.IsClient) Client</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" @*onclick="EditUser()"*@ />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+@*<script type="text/javascript">
+    function EditUser() {
+    debugger;
+    var user = {};
+    var roles = [];
+
+    user.FirstName = $("#FirstName").val();
+    user.LastName = $("#LastName").val();
+    user.IDNP = $("#IDNP").val();
+    user.BirthDate = $("#BirthDate").val();
+    user.Adress = $("#Adress").val();
+    user.Email = $("#Email").val();
+    user.Password = $("#Password").val();
+
+    if ($("#IsLocked").is(":checked")) {
+        user.IsLocked = 1;
+    }
+    else {
+        user.IsLocked = 0;
+    }
+
+    if ($("#Admin").is(":checked")) {
+        roles.push("Admin");
+    }
+    if ($("#Accountant").is(":checked")) {
+        roles.push("Accountant");
+    }
+    if ($("#Client").is(":checked")) {
+        roles.push("Client");
+    }
+    user.Roles = roles;
+    $.ajax({
+        method: "POST",
+        url: "/User/EditUser",
+        data: JSON.stringify(user),
+        //dataType: "html",
+        contentType: "application/json",
+        success: function () {
+            window.location.href = "/User/GetUsers"
+        },
+        error: function () {
+            alert("Error");
+        }
+    })
+}
+</script>*@

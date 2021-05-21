@@ -1,0 +1,154 @@
+﻿@model List<MolDavaBanking.Domain.UserViewModel.UserViewModel_GetUsers>
+
+@{
+    ViewBag.Title = "All Users";
+}
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>IsLocked</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.FirstName @user.LastName</td>
+                    <td id="email_@user.UserId">@user.Email</td>
+                    @if (user.IsLocked == 0)
+                    {
+                        <td id="lockStatus_@user.UserId">Unlocked</td>
+                    }
+                    else
+                    {
+                        <td id="lockStatus_@user.UserId">Locked</td>
+                    }
+                    <td>
+                        @Html.ActionLink("Edit", "EditUser", "User", new { user.UserId }, new { }) |
+                        @Html.ActionLink("Delete", "DeleteUser", "User", new { user.UserId }, new { }) |
+                        @Html.ActionLink("Reset Password", "SendResetPasswordEmail", "User", new { user.UserId }, new { @onclick = "SendResetPasswordEmail(" + user.UserId + ")" })
+                    </td>
+                    <td>
+                        <button onclick="ShowUserDetails(@user.UserId)">Details</button>
+                        @if (user.IsLocked == 0)
+                        {
+                            <button id="lockStatusButton_@user.UserId" onclick="ChangeUserLockStatus(@user.UserId)">Lock</button>
+                        }
+                        else
+                        {
+                            <button id="lockStatusButton_@user.UserId" onclick="ChangeUserLockStatus(@user.UserId)">Unlock</button>
+                        }
+                    </td>
+                </tr>
+
+                <tr id="detailsUser_@user.UserId" hidden="hidden">
+                    <td>
+                        Address: @user.Adress<br />
+                        Date of birth: @user.BirthDate.Day/@user.BirthDate.Month/@user.BirthDate.Year<br />
+                        IDNP: @user.IDNP<br />
+                        Roles: @foreach (var role in user.Roles)
+                        {
+                            @role.Name<br />
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tr>
+            <td>
+                <br />
+                @Html.ActionLink("Create new user", "CreateUser", "User", new { }, new { @class = "btn btn-default" })
+            </td>
+            <td colspan="2" align="center">
+                <span id="pagesShow">
+                    <ul class="pagination">
+                        <li>@Html.ActionLink("<<", "GetUsers", "User", new { page = 0 }, new { id = "previous" })</li>
+                    </ul>
+                    @if (ViewBag.dbCount != null)
+                    {
+                        for (int i = 1; i <= ViewBag.dbCount; i++)
+                        {
+                            <ul class="pagination">
+                                <li>@Html.ActionLink(@i.ToString(), "GetUsers", "User", new { page = i }, new { id = "paging", onclick = "getPageText()" })</li>
+                            </ul>
+                        }
+                    }
+                    <ul class="pagination">
+                        <li>@Html.ActionLink(">>", "GetUsers", "User", new { page = ViewBag.dbCount }, new { id = "previous" })</li>
+                    </ul>
+                </span>&nbsp;
+            </td>
+        </tr>
+    </table>
+</div>
+
+<style>
+    #pagesShow a {
+        width: 30px;
+        height: 30px;
+        border-color: cornflowerblue;
+        text-align: center;
+        padding-right: 15px;
+        padding-top: 5px;
+        background-color: white;
+        transition-duration: 0.4s;
+        color: black;
+        border: 2px solid cornflowerblue;
+    }
+
+        #pagesShow a:hover {
+            background-color: cornflowerblue;
+        }
+</style>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function ShowUserDetails(userId) {
+            var detailsElement = $("#detailsUser_" + userId);
+            var elementVisibility = detailsElement.is(":hidden");
+
+            if (elementVisibility) {
+                detailsElement.show();
+            }
+            else {
+                detailsElement.hide();
+            }
+        }
+
+        function ChangeUserLockStatus(userId) {
+            var userLockStatus = $("#lockStatus_" + userId).text();            
+            var lockStatus = userLockStatus == "Unlocked" ? 1 : 0;
+            var userToChangeLockStatus = { UserId: userId, IsLocked: lockStatus };
+            $.ajax({
+                method: "POST",
+                url: "/User/ChangeUserLockStatus",
+                data: JSON.stringify(userToChangeLockStatus),
+                dataType: "JSON",
+                contentType: "application/json",
+                success: function (lockStatus) {
+                    if (lockStatus == 0) {
+                        $("#lockStatus_" + userId).text("Unlocked");
+                        $("#lockStatusButton_" + userId).text("Lock");
+                    }
+                    else {
+                        $("#lockStatus_" + userId).text("Locked");
+                        $("#lockStatusButton_" + userId).text("Unlock");
+                    }
+                },
+                error: function () {
+
+                }
+            })
+        }
+
+        function SendResetPasswordEmail(userId) {
+            var userEmail = $("#email_" + userId).text();
+            alert("An email with a reset password link was sent to " + userEmail);
+        }
+    </script>
+}

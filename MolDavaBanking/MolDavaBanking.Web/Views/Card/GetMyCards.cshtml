@@ -1,0 +1,60 @@
+﻿@model List<MolDavaBanking.Domain.CardViewModel.CardViewModel_Get>
+
+@{
+    ViewBag.Title = "My Cards";
+}
+
+<div class="row">
+    <div class="col-md-2">&nbsp;</div>
+    <div class="col-md-8">
+        <div class="row space-16">&nbsp;</div>
+        <div class="row">
+            @foreach (var card in Model)
+            {
+                <div class="col-sm-4">
+                    <div class="thumbnail">
+                        <div class="caption text-center" @*onclick="location.href='https://flow.microsoft.com/en-us/connectors/shared_slack/slack/'"*@>
+                            @*<div class="position-relative">
+                                    <img src="https://az818438.vo.msecnd.net/icons/slack.png" style="width:72px;height:72px;" />
+                                </div>*@
+                            <h4 id="thumbnail-label">@card.CardType Card</h4>
+                            <p><i class="glyphicon glyphicon-credit-card"></i>&nbsp;@card.CardNumber</p>
+                            <div class="thumbnail-description smaller">
+                                <label>Current Balance:</label> @card.Amount @card.Currency
+                                <label>Expiration Date:</label> @card.ExpirationDate.Day/@card.ExpirationDate.Month/@card.ExpirationDate.Year
+                            </div>
+                        </div>
+                        <div class="caption card-footer text-center">
+                            <ul class="list-inline">
+                                <li><i class="people lighter"></i>&nbsp;Active</li>
+                                <li></li>
+                                <li><i class="glyphicon glyphicon-exclamation-sign"></i><a href="#">&nbsp;Report as Lost</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-2">&nbsp;</div>
+    </div>
+</div>
+
+@section Styles{
+    <style>
+        .thumbnail {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+            transition: 0.3s;
+            min-width: 40%;
+            border-radius: 5px;
+        }
+
+        .thumbnail-description {
+            min-height: 40px;
+        }
+
+        .thumbnail:hover {
+            cursor: pointer;
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 1);
+        }
+    </style>
+}

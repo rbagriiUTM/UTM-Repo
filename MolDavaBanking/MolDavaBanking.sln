@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MolDavaBanking.Web", "MolDavaBanking.Web\MolDavaBanking.Web.csproj", "{232C0C10-53FC-4FB1-B7E3-3F23A4C636FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MolDavaBanking.Managers", "MolDavaBanking.Managers\MolDavaBanking.Managers.csproj", "{85F97147-E531-4424-8389-7FDAE4360EC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MolDavaBanking.Repositories", "MolDavaBanking.Repositories\MolDavaBanking.Repositories.csproj", "{D83B2038-D484-4B95-83B0-6449D356451A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MolDavaBanking.Persistance", "MolDavaBanking.Persistance\MolDavaBanking.Persistance.csproj", "{5BF46342-4091-40E7-B777-8540B65C0769}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MolDavaBanking.Domain", "MolDavaBanking.Domain\MolDavaBanking.Domain.csproj", "{F17595E7-794F-439F-BFDB-A31A90DFEC7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MolDavaBanking.Tests", "MolDavaBanking.Tests\MolDavaBanking.Tests.csproj", "{FBCBA1DB-43DB-457A-9310-6BEB680EC775}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{232C0C10-53FC-4FB1-B7E3-3F23A4C636FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{232C0C10-53FC-4FB1-B7E3-3F23A4C636FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{232C0C10-53FC-4FB1-B7E3-3F23A4C636FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{232C0C10-53FC-4FB1-B7E3-3F23A4C636FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85F97147-E531-4424-8389-7FDAE4360EC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85F97147-E531-4424-8389-7FDAE4360EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85F97147-E531-4424-8389-7FDAE4360EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85F97147-E531-4424-8389-7FDAE4360EC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D83B2038-D484-4B95-83B0-6449D356451A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D83B2038-D484-4B95-83B0-6449D356451A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D83B2038-D484-4B95-83B0-6449D356451A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D83B2038-D484-4B95-83B0-6449D356451A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BF46342-4091-40E7-B777-8540B65C0769}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BF46342-4091-40E7-B777-8540B65C0769}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BF46342-4091-40E7-B777-8540B65C0769}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BF46342-4091-40E7-B777-8540B65C0769}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F17595E7-794F-439F-BFDB-A31A90DFEC7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F17595E7-794F-439F-BFDB-A31A90DFEC7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F17595E7-794F-439F-BFDB-A31A90DFEC7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F17595E7-794F-439F-BFDB-A31A90DFEC7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBCBA1DB-43DB-457A-9310-6BEB680EC775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBCBA1DB-43DB-457A-9310-6BEB680EC775}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBCBA1DB-43DB-457A-9310-6BEB680EC775}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBCBA1DB-43DB-457A-9310-6BEB680EC775}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5876086-9D84-40F8-926D-E10DD3B1E998}
+	EndGlobalSection
+EndGlobal

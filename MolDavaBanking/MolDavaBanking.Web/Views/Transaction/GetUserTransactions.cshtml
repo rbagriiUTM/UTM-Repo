@@ -1,0 +1,580 @@
+﻿@model List<MolDavaBanking.Domain.TransactionViewModel.TransactionViewModel_GetTransactions>
+@using currencies = MolDavaBanking.Domain.TransactionViewModel.Currencies
+@using statuses = MolDavaBanking.Domain.TransactionViewModel.Statuses
+
+@{
+    ViewBag.Title = "All Transactions";
+}
+@{ int a = 0; }
+<div id="dialog" title="User Details"></div>
+
+<h3>Transactions</h3>
+
+<div class="error_message" hidden>
+    <h4 class="error_title">Error</h4>
+    <p>
+        Number required
+    </p>
+</div>
+<br />
+
+<div class="display_block">
+    <span class="something_inline">
+        <div class="first_table">
+            <table style="width:100%;" class="user_table">
+                <thead>
+                    <tr>
+                        <th class="big_th">Transaction Number</th>
+                        <th class="big_th2">
+                            <span>Date-Time <button class="btn btn-info" style="height:15px; width:15px;font-size:10px; padding:0; border-radius:3px;" name="CreatedDate" id="date_asc" value="ascendent" onclick="dateFilter('date_asc')">⮝</button> <button class="btn btn-info" style="height:15px; width:15px;font-size:10px; padding:0; border-radius:3px;" name="CreatedDate" id="date_desc" value="descendent" onclick="dateFilter('date_desc')">⮟</button></span>
+                        </th>
+                        <th>Status</th>
+                        <th class="button_action">
+                            <span>Amount <button class="btn btn-info" style="height:15px; width:15px;font-size:10px; padding:0; border-radius:3px;" name="Amount" id="amount_asc" value="ascendent" onclick="dateFilter('amount_asc')">⮝</button> <button class="btn btn-info" style="height:15px; width:15px;font-size:10px; padding:0; border-radius:3px;" name="Amount" id="amount_desc" value="descendent" onclick="dateFilter('amount_desc')">⮟</button></span>
+                        </th>
+                        <th>Currency</th>
+                    </tr>
+                </thead>
+                <tbody id="radu2">
+                    @foreach (var transaction in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => transaction.TransactionNumber)</td>
+                            <td>@Html.DisplayFor(modelItem => transaction.CreatedDate.LocalDateTime)</td>
+                            <td>@Html.DisplayFor(modelItem => transaction.Status)</td>
+                            <td>@Html.DisplayFor(modelItem => transaction.Amount)</td>
+                            <td>@Html.DisplayFor(modelItem => transaction.Currency)</td>
+                            <td><a href="#" data-toggle="popover" data-trigger="hover" id="@transaction.TransactionNumber">info</a></td>
+                        </tr>
+                    }
+                </tbody>
+                <tr>
+                    <td> <button type="button" id="show_filter" onclick="showFilters()" class="btn btn-info" style="height:40px; border-radius:10px; width:150px; text-align:center; padding:0;">Show extended filter</button></td>
+                    <td colspan="2">
+                        <span id="pagesShow">
+                            <ul class="pagination">
+                                <li>@Html.ActionLink("<<", "GetUserTransactions", "Transaction", new { id = 0 }, new { id = "previous" })</li>
+                            </ul>
+                            @if (ViewBag.dbCount != null)
+                            {
+                                for (int i = 1; i <= ViewBag.dbCount; i++)
+                                {
+                                    <ul class="pagination">
+                                        <li>@Html.ActionLink(@i.ToString(), "GetUserTransactions", "Transaction", new { id = i }, new { id = "paging", onclick = "getPageText()" })</li>
+                                    </ul>
+                                }
+                            }
+                            <ul class="pagination">
+                                <li>@Html.ActionLink(">>", "GetUserTransactions", "Transaction", new { id = ViewBag.dbCount }, new { id = "previous" })</li>
+                            </ul>
+                        </span>&nbsp;
+                    </td>
+                    <td colspan="2"><span id="numberOfItemsToShow" hidden>Items on page: </span></td>
+                </tr>
+            </table>
+        </div>
+    </span>
+        <div class="form_input" hidden id="form_input">
+            @using (Html.BeginForm())
+            {
+                <div><h4>Status</h4></div>
+                <div>
+                    @foreach (var item in Enum.GetValues(typeof(statuses)))
+                    {
+                        <span>
+                            <input type="checkbox" value="@item" id="status_stat" name="messageCheckbox" />@item
+                        </span>
+                    }
+                </div>
+                <br />
+                <div>
+                    <h4>Transaction Number</h4>
+                </div>
+                <div>
+                    <input type="text" id="transactionNumber" />
+                </div>
+                <br />
+                <div>
+                    <h4>Currency</h4>
+                </div>
+                <div>
+                    <select id="select_currency1" onchange="insertValueInTextbox()">
+                        <option id="-1">Please select a currency</option>
+                        @foreach (var item in Enum.GetValues(typeof(currencies)))
+                        {
+                            <option id="@((int)item)">@item</option>
+                        }
+                    </select>
+                </div>
+                <br />
+                <div>
+                    <input type="text" id="selected_currency" style="height:40px; width:190px;" readonly />
+                </div>
+                <br />
+                <h4>Amount</h4>
+                <div>
+                    <label for="amount">Maximum price:</label>
+                    <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                </div>
+                <div id="slider-range-min"></div>
+                <br />
+                <h4>Date-time frame</h4>
+                <div>
+                    <span>From</span>
+                    <input type="text" id="from" name="from" style="width:100px;" placeholder="mm/dd/yyyy">
+                    <span>to</span>
+                    <input type="text" id="to" name="to" style="width:100px;" placeholder="mm/dd/yyyy">
+                </div>
+                <br />
+                <div>
+                    <span><input type="button" onclick="myFunction()" value="Filter" class="btn btn-info" /></span>
+                    <span><input type="button" onclick="resetFilters()" value="Reset Filters" id="demo2" class="btn btn-success" /></span>
+                    <span><button type="button" class="btn btn-warning" onclick="hideFilters()">></button></span>
+                </div>
+            }
+        </div>
+    </span>
+</div>
+@section Styles{
+    @Styles.Render("~/Content/themes/base/css")
+    <link href="~/Content/themes/base/jquery-ui.css" rel="stylesheet" />
+
+    <style>
+        .user_table tr {
+            height: 30px;
+        }
+
+        .user_table th {
+            font-size: 15px;
+        }
+
+        .button_action {
+            width: 1150px;
+        }
+
+        .user_table {
+            border-top: 1px solid blue;
+        }
+
+        .table_filter {
+            border: 1px solid #84b3ff;
+            margin-left: 20px;
+            margin-top: 0px;
+        }
+
+        .something_inline {
+            float: left;
+            width: 50%;
+        }
+
+        .display_block {
+            display: block;
+            width: 100%;
+        }
+
+        .first_table {
+            width: 190%;
+        }
+
+        .form_input {
+            margin-left: 830px;
+            margin-top: -40px;
+            width: 350px;
+        }
+
+        th {
+            width: 600px;
+        }
+
+        .big_th {
+            width: 1200px;
+        }
+
+        .big_th2 {
+            width: 1300px;
+        }
+
+        #pagesShow button {
+            width: 30px;
+            height: 30px;
+            border-color: cornflowerblue;
+            text-align: center;
+            background-color: white;
+            transition-duration: 0.4s;
+            border: 2px solid cornflowerblue;
+            border-radius: 2px;
+        }
+
+            #pagesShow button:hover {
+                background-color: cornflowerblue;
+            }
+
+        #pagesShow a {
+            width: 30px;
+            height: 30px;
+            border-color: cornflowerblue;
+            text-align: center;
+            padding-right: 15px;
+            padding-top: 5px;
+            background-color: white;
+            transition-duration: 0.4s;
+            color: black;
+            border: 2px solid cornflowerblue;
+        }
+
+            #pagesShow a:hover {
+                background-color: cornflowerblue;
+            }
+
+        #nrItems {
+            width: 50px;
+            height: 30px;
+            text-align: center;
+        }
+
+        #numberOfItemsToShow {
+            font-size: 15px;
+        }
+
+        .error_title {
+            background-color: #ccccff;
+            text-align: center;
+            width: 190px;
+            margin-left: 5px;
+            border-radius: 3px;
+            color: #ff8000;
+            font-weight: bold;
+        }
+
+        .error_message {
+            padding-top: 1px;
+            width: 200px;
+            text-align: center;
+            background-color: #e6e6ff;
+            align-content: center;
+            border-radius: 2px;
+            height: 70px;
+            position: absolute;
+            margin-top: -55px;
+            margin-left: 300px;
+            color: #ff8000;
+        }
+    </style>
+}
+
+
+@section Scripts{
+    <script src="~/Scripts/jquery-1.12.4.js"></script>
+    <script src="~/Scripts/jquery-ui.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/block-ui.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('[data-toggle="popover"]').popover({
+                title: setData,
+                html: true,
+                placement: 'auto',
+            });
+            function setData(id) {
+                var set_data = '';
+                var element = $(this);
+                var id = element.attr("id");
+                $.ajax({
+                    url: "/Transaction/GetTransactionDetailsByTransactionNumber?id" + id,
+                    method: "post",
+                    async: false,
+                    data: { id: id },
+                    success: function (data) {
+                        debugger;
+                        set_data = data;
+                    }
+
+                });
+                return set_data;
+            }
+        });
+
+         $(function () {
+            var dateFormat = "mm/dd/yy",
+                from = $("#from")
+                    .datepicker({
+                        defaultDate: "+1w",
+                        changeMonth: true,
+                        numberOfMonths: 1
+                    })
+                .on("change", function () {
+                    to.datepicker("option", "minDate", getDate(this));
+                }),
+                to = $("#to").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 1
+                })
+                    .on("change", function () {
+                        from.datepicker("option", "maxDate", getDate(this));
+                    });
+
+            function getDate(element) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate(dateFormat, element.value);
+                } catch (error) {
+                    date = null;
+                }
+
+                return date;
+            }
+        });
+
+        var currencies = [];
+        var statuses = [];
+        var ascendent = true;
+        var fieldToSort;
+        var page;
+        var itemsPerPage;
+        var status;
+        var currency;
+        var pageNumber;
+
+        function setNumberOfItems()
+        {
+            var regex = /^\d*$/;
+            if ($("#nrItems").val().match(regex)) {
+                itemsPerPage = $("#nrItems").val();
+            }
+            else
+            {
+                $(".error_message").show("bounce", 500);
+            }
+        }
+
+        function hideError()
+        {
+            $(".error_message").hide("bounce", 700);
+        }
+
+        function getPage(pageID) {
+            debugger;
+            page = $("#" + pageID).val();
+            myFunction();
+        }
+
+        function dateFilter(buttonID)
+        {
+            debugger;
+            e = ($("#" + buttonID).val());
+            if ($("#" + buttonID).val() == "ascendent")
+            {
+                ascendent = true;
+            }
+            else
+            {
+                ascendent = false;
+            }
+            fieldToSort = $("#" + buttonID).attr("name");
+            myFunction();
+        }
+
+        function getChecked()
+        {
+            debugger;
+            $("input[name='messageCheckbox']:checked").each(function (i) {
+                statuses[i] = $(this).val();
+            });
+        }
+
+        function insertValueInTextbox()
+        {
+            var seletedItem = $("#select_currency1").children(":selected");
+            debugger;
+            if (seletedItem.attr("id") != -1) {
+                currencies.push(seletedItem.attr("id"));
+                seletedItem.hide();
+                $('#selected_currency').val($('#selected_currency').val() + " " + seletedItem.val());
+            }
+        }
+
+    function myFunction()
+    {
+        getChecked();
+        debugger;
+        var sorting = {};
+        sorting.SortField = fieldToSort;
+        sorting.Ascending = ascendent;
+        var filtering = {};
+        filtering.Currencies = currencies;
+        filtering.Statuses = statuses;
+        filtering.AmountSelected = $("#amount").val();
+        filtering.DateFrom = $("#from").val();
+        filtering.DateTo = $("#to").val();
+        filtering.TransactionNumber = $("#transactionNumber").val();
+        var pagination = {};
+        pagination.Page = page;
+        pagination.PageSize = itemsPerPage;
+        $.ajax({
+                type: "POST",
+                url: "/Transaction/GetTransactions",
+                data: JSON.stringify({ sortRow: sorting, filterData: filtering, getInformationOnPage: pagination }),
+                dataType: "json",
+                async: true,
+                contentType: "application/json;",
+                success: function (ajaxResult) {
+                    BlockUI();
+                    debugger;
+                    var createTable = "";
+                    for (var i = 0; i < ajaxResult.appliedFilterToTransactions.length; i++) {
+                        var u = ajaxResult.appliedFilterToTransactions[i].CreatedDate.replace(/[^0-9]/g, '');
+                        var c = new Date(+u).toLocaleDateString() + " " + new Date(+u).toLocaleTimeString();
+                        getNameByValueStatus(ajaxResult.appliedFilterToTransactions[i].Status);
+                        getNameByValueCurrency(ajaxResult.appliedFilterToTransactions[i].Currency);
+                        createTable += "<tr>";
+                        createTable += "<td>" + ajaxResult.appliedFilterToTransactions[i].TransactionNumber + "</td>";
+                        createTable += "<td>" + c + "</td>";
+                        createTable += "<td>" + status + "</td>";
+                        createTable += "<td>" + ajaxResult.appliedFilterToTransactions[i].Amount + "</td>";
+                        createTable += "<td>" + currency + "</td>";
+                        createTable += "</tr>";
+                    }
+                    if (createTable == "") {
+                        createTable = "<tr></tr><tr><td></td><td></td><td><h4>No data</h4></td><td></td><td></td></tr>";
+                        setTimeout(function () { $("#radu2").html(createTable) }, 800);
+                    }
+                    else {
+                        setTimeout(function () { $("#radu2").html(createTable) }, 800);
+                    }
+                    var createPages = "<br/>";
+                    var numberOfItems = "";
+                    if (ajaxResult.totalPages != null)
+                        for (var i = 1; i <= ajaxResult.totalPages; i++)
+                        {
+                            createPages += "<button"
+                            createPages += " value = " + i + " "
+                            createPages += "id = " + "page" + i + " " + "onclick=" + "getPage(" + "'" + "page" + i + "'" + ")" + " " +" > " + i + "</button > "
+                        }
+                    if (createTable != "<tr></tr><tr><td></td><td></td><td><h4>No data</h4></td><td></td><td></td></tr>") {
+                        numberOfItems += "<input"
+                        numberOfItems += " type= " + "text" + " " + "id = " + "nrItems" + " " + "onfocusout=" + "setNumberOfItems(" + ")" + " " + "onfocus=" + "hideError(" + ")" + " " + ">"
+                        setTimeout(function () { $("#numberOfItemsToShow").show() }, 800);
+                        setTimeout(function () { $("#numberOfItemsToShow").html($("#numberOfItemsToShow").text() + numberOfItems) }, 800);
+                    }
+                    else {
+                        setTimeout(function () { $("#numberOfItemsToShow").hide() },800);
+                    }
+                    setTimeout(function () { $("#pagesShow").html(createPages) }, 800);
+                },
+                error: function (e) {
+                    debugger;
+                    alert("Please select a correct filter");
+                }
+            });
+    }
+
+        function showFilters() {
+        setTimeout($(".first_table").animate({ 'width': '134%' }, 500), 800);
+        $(".form_input").fadeIn(2000);
+        $("#show_filter").hide();
+        myFunction();
+        $("#pagesShow2").hide();
+    }
+
+    function hideFilters()
+    {
+        $(".first_table").animate({ 'width': '190%' }, 500);
+        $(".form_input").hide();
+        $("#show_filter").show();
+    }
+
+    $(function () {
+        $("#slider-range-min").slider({
+            range: "min",
+            value: @ViewBag.maxVal,
+            min: @ViewBag.minVal,
+            max: @ViewBag.maxVal,
+            slide: function (event, ui) {
+                $("#amount").val(ui.value);
+            }
+        });
+        $("#amount").val($("#slider-range-min").slider("value"));
+    });
+
+      function getNameByValueStatus(value) {
+          switch (value) {
+              case 0: status = "Pending"
+                  break;
+              case 1: status = "Completed"
+                  break;
+              case 2: status = "Processing"
+                  break;
+              case 3: status = "Canceled"
+                  break;
+              default: status = "undefined"
+          }
+        }
+
+        function getNameByValueCurrency(value){
+            switch (value) {
+                case 0: currency = "EUR"
+                    break;
+                case 1: currency = "USD"
+                    break;
+                case 2: currency = "MDL"
+                    break;
+                case 3: currency = "RUB"
+                    break;
+                default: currency = "undefined"
+            }
+        }
+
+    function BlockUI() {
+        $.blockUI({
+            message: 'Loading ...',
+            css: {
+                border: 'none',
+                padding: '15px',
+                backgroundColor: '#000',
+                '-webkit-border-radius': '10px',
+                '-moz-border-radius': '10px',
+                opacity: '.5',
+                color: '#fff',
+                fontSize: '18px',
+                fontFamily: 'Verdana,Arial',
+                fontWeight: 200,
+            }
+        });
+
+        setTimeout($.unblockUI, 500);
+    };
+
+    function resetFilters() {
+        debugger;
+        currencies = [];
+        statuses = [];
+        var hiddenItems = $("#select_currency1").children(":hidden");
+        hiddenItems.show();
+        $("#selected_currency").val("");
+        $("#from").val("");
+        $("#to").val("");
+        $("#from").datepicker("option", "maxDate", '1/1/7000');
+        $("#to").datepicker("option", "minDate", '1/1/0001');
+        $('input[name=messageCheckbox]').attr('checked', false);
+        $("#transactionNumber").val("");
+        fieldToSort = null;
+        ascendent = true;
+        itemsPerPage = 0;
+        hideError();
+        $("#slider-range-min").slider({
+            range: "min",
+            value: @ViewBag.maxVal,
+            min: @ViewBag.minVal,
+            max: @ViewBag.maxVal,
+            slide: function (event, ui) {
+                $("#amount").val(ui.value);
+            }
+        });
+        $("#amount").val($("#slider-range-min").slider("value"));
+        page = '1';
+        setTimeout(myFunction(), 800);
+    }
+    </script>
+}

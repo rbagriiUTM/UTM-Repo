@@ -1,0 +1,275 @@
+﻿@model List<MolDavaBanking.Domain.TransactionViewModel.TransactionViewModel_GetTransactions>
+
+@{
+    ViewBag.Title = "My Statistics";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <span style="font-size:30px; cursor:pointer" onclick="openNav()">&#9776;</span>
+        </div>
+        <div class="sidenav" id="mySidenav">
+            <a class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#">Banks</a>
+            <a href="#">Currencies</a>
+            <button class="dropdown-btn">
+                Expenses
+                <i class="glyphicon glyphicon-collapse-down"></i>
+            </button>
+            <div class="dropdown-container">
+                <a onclick="RenderColumnChart(columnChartValues)">Current Year</a>
+                <a href="#">Current Month</a>
+            </div>
+            <a onclick="RenderPieChart(pieChartValues)">Statuses</a>
+        </div>
+
+
+        <div class="col-md-10">
+            <div id="chart" style="height: 100%; width: 100%; margin-top:9%;"></div>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+    <style>
+        .navbar-fixed-left {
+            position: fixed;
+        }
+
+            .navbar-fixed-left .navbar-nav > li {
+                float: none;
+            }
+
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 45px;
+            left: 0;
+            background-color: black;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+            .sidenav a, .dropdown-btn {
+                padding: 8px 8px 8px 32px;
+                text-decoration: none;
+                font-size: 25px;
+                color: #818181;
+                display: block;
+                transition: 0.3s;
+                border: none;
+                background: none;
+                text-align: left;
+                cursor: pointer;
+                outline: none;
+            }
+
+                .sidenav a:hover, .dropdown-btn:hover {
+                    color: #f1f1f1;
+                }
+
+            .sidenav .closebtn {
+                position: absolute;
+                top: 0;
+                right: 25px;
+                font-size: 36px;
+                margin-left: 50px;
+            }
+
+        .dropdown-container {
+            display: none;
+            background-color: #262626;
+            padding-left: 8px;
+        }
+
+        .active {
+            background-color: black;
+            color: white;
+        }
+    </style>
+}
+
+@section Scripts{
+    <script src="~/Scripts/canvasjs.min.js"></script>
+
+    <script>
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        const statusNames = ["Pending", "Completed", "Processing", "Canceled"];
+
+        var pieChartValues;
+        var columnChartValues;
+
+        $(document).ready(function () {
+            DrawCharts();
+        })
+
+        function DrawCharts() {
+            $.ajax({
+                method: "POST",
+                url: "/Statistics/GetMyTransacationInfoNeededForCharts",
+                success: function (transactions) {
+                    pieChartValues = SetPieChartValues(transactions.PieChart);
+                    columnChartValues = SetColumnChartValues(transactions.ColumnChart);
+                    RenderColumnChart(columnChartValues);
+                },
+                error: function () {
+
+                }
+            })
+        }
+
+        function SetPieChartValues(transactions) {
+            var pieChartValues = [];
+            $.each(transactions, function (i, val) {
+                if (val.length > 0) {
+                    var statusName = val[0].Status;
+
+                    var valueSet = {
+                        y: 0,
+                        indexLabel: statusNames[statusName],
+                    };
+
+                    for (var j = 0; j < val.length; j++) {
+                        valueSet.y++;
+                    }
+                    pieChartValues.push(valueSet);
+                }
+            });
+
+            return pieChartValues;
+        }
+
+        function RenderPieChart(values) {
+            debugger;
+            SetDropdownContainerToHidden();
+
+            var chart = new CanvasJS.Chart("chart", {
+                backgroundColor: "white",
+                colorSet: "colorSet2",
+
+                title: {
+                    text: "My Tranasctions Statuses",
+                    fontFamily: "Verdana",
+                    fontSize: 25,
+                    fontWeight: "normal",
+                },
+                animationEnabled: true,
+                data: [{
+                    indexLabelFontSize: 15,
+                    indexLabelFontFamily: "Monospace",
+                    indexLabelFontColor: "darkgrey",
+                    indexLabelLineColor: "darkgrey",
+                    indexLabelPlacement: "outside",
+                    type: "pie",
+                    showInLegend: false,
+                    toolTipContent: "<strong>#percent%</strong>",
+                    dataPoints: values
+                }]
+            });
+            chart.render();
+        }
+
+        function SetColumnChartValues(transactions) {
+            var chartValues = [];
+            $.each(transactions, function (i, val) {
+                if (val.length > 0) {
+                    var date = new Date(parseInt(val[0].CreatedDate.substr(6)));
+
+                    var month = date.getMonth();
+
+                    var monthName = monthNames[month];
+
+                    var valueSet = {
+                        y: 0.0,
+                        label: monthName
+                    };
+
+                    for (var j = 0; j < val.length; j++) {
+                        valueSet.y += val[j].Amount;
+                    }
+                    chartValues.push(valueSet);
+                }
+            });
+
+            return chartValues;
+        }
+
+        function RenderColumnChart(values) {
+            var chart = new CanvasJS.Chart("chart", {
+                backgroundColor: "white",
+                colorSet: "colorSet3",
+                title: {
+                    text: "Current Year Expensions",
+                    fontFamily: "Verdana",
+                    fontSize: 25,
+                    fontWeight: "normal",
+                },
+                animationEnabled: true,
+                legend: {
+                    verticalAlign: "bottom",
+                    horizontalAlign: "center"
+                },
+                theme: "theme1",
+                data: [
+
+                    {
+                        indexLabelFontSize: 15,
+                        indexLabelFontFamily: "Monospace",
+                        indexLabelFontColor: "darkgrey",
+                        indexLabelLineColor: "darkgrey",
+                        indexLabelPlacement: "outside",
+                        type: "column",
+                        showInLegend: false,
+                        legendMarkerColor: "grey",
+                        dataPoints: values
+                    }
+                ]
+            });
+
+            chart.render();
+        }
+    </script>
+
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+    </script>
+
+    <script>
+        var dropdown = document.getElementsByClassName("dropdown-btn");
+        var i;
+
+        for (i = 0; i < dropdown.length; i++) {
+            dropdown[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var dropdownContent = this.nextElementSibling;
+                if (dropdownContent.style.display === "block") {
+                    dropdownContent.style.display = "none";
+                } else {
+                    dropdownContent.style.display = "block";
+                }
+            });
+        }
+
+        function SetDropdownContainerToHidden() {
+            debugger;
+
+            var a = $(".dropdown-container");
+            var b = $(".dropdown-btn");
+            b.removeClass("active");
+            a.hide();
+        }
+    </script>
+}

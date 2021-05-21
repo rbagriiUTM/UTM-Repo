@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @RenderSection("styles", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("MolDava Banking", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li>@Html.ActionLink("Users", "GetUsers", "User")</li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Support Messages <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="/Support/GetSupportMessages">Inbox</a></li>
+                                    <li><a href="#">Unread</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Sent</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Deleted</a></li>
+                                </ul>
+                            </li>
+                            }
+                            else if (User.IsInRole("Accountant"))
+                            {
+                            <li>@Html.ActionLink("Transactions", "GetTransactions", "Transaction")</li>
+                            <li>@Html.ActionLink("Cards", "GetCards", "Card")</li>
+                            }
+                            else
+                            {
+                            <li>@Html.ActionLink("My Transactions", "GetUserTransactions", "Transaction")</li>
+                            <li>@Html.ActionLink("My Cards", "GetMyCards", "Card")</li>
+                            <li>@Html.ActionLink("My Statistics", "Index", "Statistics")</li>
+                            <li>@Html.ActionLink("ChargeBacks", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Payments", "Index", "Home")</li>
+                            <li>@Html.ActionLink("Contact Us", "ContactSupport", "Support")</li>
+                            }
+                            <li>@Html.ActionLink("Welcome Mr/Ms : " + User.Identity.Name, "Index", "Home")</li>
+                            <li>@Html.ActionLink("Logout", "Logout", "Authentication")</li>
+                            }
+                            else
+                            {
+                            <li>@Html.ActionLink("Register", "Register", "Authentication")</li>
+                            <li>@Html.ActionLink("Login", "Login", "Authentication")</li>
+                            }
+                        </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        @*<hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - MolDava Banking</p>
+        </footer>*@
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

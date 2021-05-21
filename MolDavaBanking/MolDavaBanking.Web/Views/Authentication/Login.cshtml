@@ -1,0 +1,60 @@
+﻿@model MolDavaBanking.Domain.UserViewModel.UserViewModel_Login
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<div class="">
+    @using (Html.BeginForm("Login", "Authentication", FormMethod.Post, new { @class="form-signin"}))
+    {
+        @Html.AntiForgeryToken()
+
+        <img src="~/Content/logo.png" alt="" width="144" height="144">
+        <h1 class="h3">Please login</h1>
+
+        <h5 style="color:red">@ViewBag.Msg</h5>
+        <h5 style="color:@TempData["Color"]">@TempData["Msg"]</h5>
+
+        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "sr-only" })
+        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", @placeholder="Email"} })
+        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+
+        @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "sr-only" })
+        @Html.PasswordFor(model => model.Password, new { @class = "form-control text-box single-line", @placeholder="Password" })
+        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" value="remember-me"> Remember me
+            </label>
+        </div>
+
+        <button class="btn btn-primary">Login</button>
+        <br />
+        <br />
+        <p class="text-muted">&copy; 2019 MolDava Banking, Inc</p>
+    }
+</div>
+
+@section Styles{
+    <style>
+        .text-center {
+            text-align: center !important;
+        }
+
+        .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+        }
+    </style>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(".container").addClass("text-center");
+    </script>
+}

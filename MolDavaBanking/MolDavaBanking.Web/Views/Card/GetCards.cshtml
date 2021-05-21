@@ -1,0 +1,123 @@
+﻿@model List<MolDavaBanking.Domain.CardViewModel.CardViewModel_Get>
+
+@{
+    ViewBag.Title = "All Cards";
+}
+
+<div>
+    <h5 style="color:@TempData["Color"]">@TempData["Msg"]</h5>
+</div>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Card Number</th>
+                <th>Card Type</th>
+                <th>Card Currency</th>
+                <th>Card Owner</th>
+                <th>Expiration Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var card in Model)
+            {
+                <tr>
+                    <td>@card.CardNumber</td>
+                    <td>@card.CardType</td>
+                    <td>@card.Currency</td>
+                    <td>@card.User.FirstName @card.User.LastName</td>
+                    <td>@card.ExpirationDate.Day/@card.ExpirationDate.Month/@card.ExpirationDate.Year</td>
+                    <td>
+                        @*<div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                    Manage
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" onclick="GetCardDetails(@card.CardId)">Details</a></li>
+                                    <li>@Html.ActionLink("Delete", "DeleteCard", "Card", new { cardId = card.CardId }, new { })</li>
+                                </ul>
+                            </div>*@
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary btn-sm">Manage</a>
+                            <a href="#" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" onclick="GetCardDetails(@card.CardId)">Details</a></li>
+                                <li>@Html.ActionLink("Delete", "DeleteCard", "Card", new { cardId = card.CardId }, new { })</li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@Html.ActionLink("Create new card", "CreateCard", "Card", new { }, new { @class = "btn btn-default" })
+
+<div id="cardDetailsModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Card Details</h4>
+            </div>
+            <div class="modal-body">
+                <strong>Bank Name:</strong>
+                <span id="bankName"></span>
+                <br />
+                <strong>Bank Address:</strong>
+                <span id="bankAddress"></span>
+                <br />
+                <strong>User Address:</strong>
+                <span id="userAddress"></span>
+                <br />
+                <strong>User IDNP:</strong>
+                <span id="userIDNP"></span>
+                <br />
+                <strong>User BirthDate:</strong>
+                <span id="userBirthDate"></span>
+                <br />
+                <strong>User Email:</strong>
+                <span id="userEmail"></span>
+                <br />
+                <strong>Amount:</strong>
+                <span id="cardAmount"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        function GetCardDetails(cardId) {
+            var card = { CardId: cardId };
+            $.ajax({
+                method: "POST",
+                url: "/Card/GetCardDetails",
+                data: JSON.stringify(card),
+                dataType: "JSON",
+                contentType: "application/json",
+                success: function (cardDetails) {
+                    $("#bankName").text(cardDetails.BankName);
+                    $("#bankAddress").text(cardDetails.BankAddress);
+                    $("#userAddress").text(cardDetails.UserAddress);
+                    $("#userIDNP").text(cardDetails.UserIDNP);
+                    var date = new Date(Date.parse(cardDetails.UserBirthDate));
+                    $("#userBirthDate").text(date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
+                    $("#userEmail").text(cardDetails.UserEmail);
+                    $("#cardAmount").text(cardDetails.CardAmount);
+                    $("#cardDetailsModal").modal({ show: true });
+                },
+                error: function () {
+
+                }
+            })
+        }
+    </script>
+}

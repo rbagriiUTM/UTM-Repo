@@ -1,0 +1,16 @@
+﻿@model List<MolDavaBanking.Domain.TransactionViewModel.TransactionViewModel_GetTransactionDetails>
+
+<div class="container">
+    <h4 style=" text-align:center;border-bottom:1px solid #808080">TransactionInfo</h4>
+    @foreach (var item in Model)
+    {
+        <p><label>Name : </label> @item.User.FirstName</p>
+        <p><label>Surname : </label> @item.User.LastName</p>
+        <p><label>IDNP : </label> @item.User.IDNP</p>
+        <p><label>Birth Date : </label> @item.User.BirthDate</p>
+        <p><label>Email : </label> @item.User.Email</p>
+        <p><label>Bank : </label> @item.Bank.Name</p>
+        <p><label>Bank Address : </label> @item.Bank.Adress</p>
+    }
+    <button></button>
+</div>

@@ -1,0 +1,238 @@
+﻿@model List<MolDavaBanking.Domain.SupportMessageViewModel.SupportMessageViewModel_Get>
+
+@{
+    ViewBag.Title = "All Support Messages";
+}
+
+<div class="row">
+    <div class="alert alert-dismissible alert-success" id="success_message" style="position:center">
+        <button type="button" class="close" onclick="SetSuccessMessageToHidden()">&times;</button>
+        <strong>Success <i class="glyphicon glyphicon-thumbs-up"></i></strong> The reply message was sent.
+    </div>
+</div>
+
+
+@if (TempData["Msg"] != null)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-dismissible alert-danger" id="deleteSupportMessageAlert">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <span>@TempData["Msg"]</span>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Created Date</th>
+                <th>Subject</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var supportMessage in Model)
+            {
+                <tr>
+                    <td>@supportMessage.User.Email</td>
+                    <td>@supportMessage.CreationDate</td>
+                    <td>@supportMessage.Subject</td>
+                    <td><a class="glyphicon glyphicon-trash" href="/Support/DeleteSupportMessage?SupportMessageId=@supportMessage.SupportMessageId" style="cursor:pointer; color:red"></a></td>
+                    @*<td><i class="glyphicon glyphicon-edit" onclick="" style="cursor:pointer"></i></td>*@
+                    <td><i class="glyphicon glyphicon-eye-open" onclick="ViewMessage(@supportMessage.SupportMessageId)" style="cursor:pointer"></i></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div id="supportMessageModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Message</h4>
+            </div>
+            <div class="modal-body">
+                <strong>From:</strong>
+                <span id="sender"></span>
+                <br />
+                <strong>Date:</strong>
+                <span id="creationDate"></span>
+                <br />
+                <strong>Subject:</strong>
+                <span id="subject"></span>
+                <br />
+                <strong>Message:</strong>
+                <span id="message"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="OpenReplySupportMessageModal()">Reply</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="replySupportMessageModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" onclick="CancelReplySupportMessage()">&times;</button>
+                <h4 class="modal-title">Reply</h4>
+                <div class="alert alert-dismissible alert-danger" id="failure_message">
+                    <button type="button" class="close" onclick="SetErrorMessageToHidden()">&times;</button>
+                    <strong>Error <i class="glyphicon glyphicon-thumbs-down"></i></strong> The reply message was not sent. Please change it and try again.
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="replySupportMessageForm">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="replyMessage" class="col-lg-2 control-label">Message</label>
+                            <div class="col-lg-10">
+                                <textarea class="form-control" rows="5" id="replyMessage" name="replyMessage" placeholder="Message"></textarea>
+                            </div>
+                            @Html.ValidationMessage("replyMessage", new { @class = "text-danger", @id = "replyMessageValidationMessage" })
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="SendReplySupportMessage(messageSubject, messageEmail)">Send</button>
+                <button type="reset" class="btn btn-default" onclick="CancelReplySupportMessage()">Cancel</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Styles{
+    <style>
+        #success_message {
+            display: none;
+        }
+
+        #failure_message {
+            display: none;
+        }
+    </style>
+}
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+
+        var messageEmail;
+        var messageSubject;
+        var validator;
+
+        function ViewMessage(supportMessageId) {
+            var message = { SupportMessageId: supportMessageId };
+            $.ajax({
+                method: "POST",
+                url: "/Support/GetSupportMessage",
+                data: JSON.stringify(message),
+                dataType: "JSON",
+                contentType: "application/json",
+                success: function (message) {
+                    messageId = message.MessageId;
+                    messageEmail = message.Sender;
+                    messageSubject = message.Subject;
+
+                    $("#sender").text(message.Sender);
+                    var date = new Date(parseInt(message.CreationDate.substr(6)));
+                    $("#creationDate").text(date.toLocaleString());
+                    $("#subject").text(message.Subject);
+                    $("#message").text(message.Message);
+                    $("#supportMessageModal").modal({ show: true });
+                },
+                error: function () {
+
+                }
+            })
+        }
+
+        function OpenReplySupportMessageModal() {
+            debugger;
+            $("#supportMessageModal").modal("hide");
+            $("#replySupportMessageModal").modal({ show: true });
+
+            $(function () {
+                validator = $("form[name='replySupportMessageForm']").validate({
+                    rules: {
+                        replyMessage: {
+                            required: true,
+                            minlength: 20
+                        }
+                    },
+                    messages: {
+                        replyMessage: {
+                            required: "Please provide a message",
+                            minlength: "Your subject must be at least 20 characters long"
+                        }
+                    }
+                });
+            });
+        }
+
+        function SendReplySupportMessage(subject, emailTo) {
+            debugger;
+
+            if (validator.form()) {
+                var body = $("#replyMessage").val();
+                var replySupportMessage = { Subject: subject, Body: body, EmailTo: emailTo };
+                $.ajax({
+                    method: "POST",
+                    url: "/Support/SendReplySupportMessage",
+                    data: JSON.stringify(replySupportMessage),
+                    dataType: "JSON",
+                    contentType: "application/json",
+                    success: function (isSent) {
+                        debugger;
+                        if (isSent) {
+                            $("#replySupportMessageModal").modal("hide");
+                            $("#replyMessage").val("");
+                            //alert("Your email was sent.");
+                            $("#failure_message").css("display", "none");
+                            $("#success_message").css("display", "block");
+                        }
+                        else {
+                            //alert("An error ocurred. The email was not sent. Please try again!");
+                            $("#failure_message").css("display", "block");
+                        }
+                    },
+                    error: function () {
+                        debugger;
+                        //alert("The email was not sent because of the invalid provided data. Change its content and try again!");
+                        $("#failure_message").css("display", "block");
+                    }
+                })
+            }
+            else {
+                $("#failure_message").css("display", "block");
+            }
+        }
+
+        function CancelReplySupportMessage() {
+            $("#replyMessage").val("");
+            $("#replyMessage-error").hide();
+            SetErrorMessageToHidden();
+            $("#replySupportMessageModal").modal("hide");
+        }
+
+        function SetErrorMessageToHidden() {
+            $("#failure_message").css("display", "none");
+        }
+
+        function SetSuccessMessageToHidden() {
+            $("#success_message").css("display", "none");
+        }
+
+    </script>
+}
